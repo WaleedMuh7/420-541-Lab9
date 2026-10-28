@@ -26,12 +26,29 @@ public class AIController : MonoBehaviour
     [Header("Vision Stability")]
     public float visionPersistence = 0.5f; // seconds to keep seeing after losing sight
     private float lastSeenTime = -999f;
-
+    public StateMachine StateMachine { get; private set; }
 
     // Add State Machine code Here
+    void Start()
+ {
+ Agent = GetComponent<NavMeshAgent>();
+ aiAnimationController = GetComponent<AIAnimationController>();
+ // Animator = GetComponent<Animator>(); // Commented out since we're not using animations
+ StateMachine = new StateMachine();
+ StateMachine.AddState(new IdleState(this));
+ StateMachine.AddState(new PatrolState(this));
+ StateMachine.AddState(new ChaseState(this));
+ StateMachine.AddState(new AttackState(this)); // Add the new AttackState
+ StateMachine.TransitionToState(StateType.Idle);
+ }
+ void Update()
+ {
+ StateMachine.Update();
+ currentState = StateMachine.GetCurrentStateType();
+ }
 
 
-    
+
     // 
     public bool CanSeePlayer()
     {
